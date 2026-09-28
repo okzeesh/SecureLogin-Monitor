@@ -1,0 +1,19 @@
+:root{color-scheme:light;--ink:#122033;--muted:#5b6d80;--line:#d7e1ea;--accent:#0f766e;--bg:#eef3f7}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 "Segoe UI",system-ui,sans-serif;background:radial-gradient(circle at top left,#d9ece8,#eef3f7 42%);color:var(--ink)}
+.page{max-width:920px;margin:0 auto;padding:32px 20px 48px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#14b8a6,#0f766e);color:#fff;display:grid;place-items:center;font-weight:700}
+.product{font-weight:700}.subtitle{font-size:13px;color:var(--muted)}
+.dash-link{margin-left:auto;color:#0f766e;font-size:14px}
+.card,.lab{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 16px 40px #12203312}
+.card{margin-bottom:16px}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:#0f766e;font-weight:700;margin:0 0 8px}
+h1{margin:0 0 8px;font-size:28px}.lede{margin:0 0 22px;color:var(--muted)}
+form{display:grid;gap:12px}label{display:grid;gap:6px;font-size:13px;font-weight:600}
+input,select,button{font:inherit}input,select{height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#f8fbfd}
+.check{display:flex;align-items:center;gap:8px;font-weight:500}input[type=checkbox]{width:16px;height:16px}
+button{height:44px;border:0;border-radius:10px;background:#0f766e;color:#fff;font-weight:700;cursor:pointer}
+button:hover{background:#115e59}.hidden{display:none}
+.status{min-height:1.4em;margin:4px 0 0;font-size:14px}.ok{color:#047857}.err{color:#b91c1c}
+.lab h2{margin:0 0 8px;font-size:16px}.lab p,.lab li{color:var(--muted);font-size:14px}
+.lab ul{padding-left:18px}code{color:#134e4a;background:#ecfdf8;padding:1px 5px;border-radius:4px}

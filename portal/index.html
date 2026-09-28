@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Helix Staff Portal</title>
+  <link rel="stylesheet" href="/portal/styles.css">
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="logo">HX</div>
+      <div>
+        <div class="product">Helix Systems</div>
+        <div class="subtitle">Staff intranet · local lab website</div>
+      </div>
+      <a class="dash-link" href="/" target="_blank" rel="noopener">Open security dashboard</a>
+    </header>
+
+    <main class="card">
+      <p class="eyebrow">Employee sign-in</p>
+      <h1>Welcome back</h1>
+      <p class="lede">This is a real local website. Every attempt is written to PostgreSQL and appears on the live dashboard.</p>
+
+      <form id="login-form">
+        <label>Username<input name="username" autocomplete="username" required maxlength="100" placeholder="alice.rahman"></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="200"></label>
+        <label>Reported location
+          <select name="country">
+            <option>United Arab Emirates</option>
+            <option>United States</option>
+            <option>United Kingdom</option>
+            <option>India</option>
+            <option>Germany</option>
+            <option>Singapore</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" name="use_mfa"> Use MFA code</label>
+        <label id="mfa-field" class="hidden">MFA code<input name="mfa_code" inputmode="numeric" maxlength="12" placeholder="654321"></label>
+        <button type="submit">Sign in</button>
+        <p id="status" class="status" role="status"></p>
+      </form>
+    </main>
+
+    <aside class="lab">
+      <h2>Lab accounts</h2>
+      <p>Use these only on this local machine.</p>
+      <ul>
+        <li><code>alice.rahman</code> / <code>Welcome123!</code> · MFA <code>654321</code></li>
+        <li><code>bob.hassan</code> / <code>Welcome123!</code></li>
+        <li><code>admin</code> / <code>Admin#2026</code></li>
+        <li><code>finance</code> / <code>Finance#2026</code></li>
+      </ul>
+      <p>Wrong passwords, rapid retries, a new browser, or a sudden country change will raise alerts on the dashboard.</p>
+    </aside>
+  </div>
+  <script src="/portal/app.js"></script>
+</body>
+</html>

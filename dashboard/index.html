@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0a1119">
   <title>SecureLogin Monitor</title>
-  <link rel="stylesheet" href="/styles.css?v=2">
+  <link rel="stylesheet" href="/styles.css?v=3">
 </head>
 <body>
   <div class="app-shell">
@@ -18,6 +18,7 @@
       <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span>Overview</a>
       <a class="nav-link" href="#events"><span class="nav-icon">↳</span>Login events</a>
       <a class="nav-link" href="#alerts"><span class="nav-icon">◈</span>Security alerts</a>
+      <a class="nav-link" href="/portal/" target="_blank" rel="noopener"><span class="nav-icon">◎</span>Staff portal</a>
       <div class="sidebar-bottom">
         <span class="live-dot"></span>
         <span id="connection-label">Connecting to database</span>
@@ -38,9 +39,12 @@
         <div>
           <div class="eyebrow">AUTHENTICATION SECURITY</div>
           <h1>Security overview</h1>
-          <p>Login activity and detected threats across your environment.</p>
+          <p>Live view of the local Helix staff website and stored login telemetry.</p>
         </div>
-        <div class="range-pill"><span class="range-dot"></span>Last 24 hours</div>
+        <div class="heading-pills">
+          <div class="range-pill live-pill" id="live-pill"><span class="range-dot"></span>Connecting live feed</div>
+          <div class="range-pill"><span class="range-dot"></span>Last 24 hours</div>
+        </div>
       </section>
 
       <section class="kpi-grid" aria-label="Key metrics">
@@ -96,9 +100,9 @@
         <div class="table-scroll"><table><thead><tr><th>CREATED</th><th>TYPE</th><th>SEVERITY</th><th>USER</th><th>SOURCE IP</th><th>STATUS</th><th>DESCRIPTION</th></tr></thead><tbody id="alerts-table"><tr><td colspan="7" class="empty-state">Loading alerts…</td></tr></tbody></table></div>
         <div class="table-footer"><span id="alert-pagination-label">—</span><div><button class="page-button" id="previous-alert-page" disabled>Previous</button><button class="page-button" id="next-alert-page" disabled>Next</button></div></div>
       </section>
-      <footer>SecureLogin Monitor <span>·</span> Synthetic and authentication telemetry</footer>
+      <footer>SecureLogin Monitor <span>·</span> Live local portal plus stored authentication telemetry</footer>
     </main>
   </div>
-  <script src="/app.js?v=2" defer></script>
+  <script src="/app.js?v=3" defer></script>
 </body>
 </html>

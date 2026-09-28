@@ -1,25 +1,41 @@
-"""Read-only FastAPI endpoints for SecureLogin Monitor."""
+"""SecureLogin Monitor API, live stream, staff portal, and dashboard."""
 
+from contextlib import asynccontextmanager
 from datetime import datetime
-from ipaddress import IPv4Address, IPv6Address
-import os
+from ipaddress import ip_address
 from pathlib import Path
 from typing import Literal
 
-import psycopg
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Response
-from pydantic import BaseModel
-from psycopg.rows import dict_row
+from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
+
+from api.db import connect, normalize_ip_rows
+from api.live import broker, event_stream
+from api.portal import router as portal_router
 
 load_dotenv()
 
+ROOT = Path(__file__).resolve().parent.parent
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    import asyncio
+
+    broker.bind_loop(asyncio.get_running_loop())
+    yield
+
+
 app = FastAPI(
     title="SecureLogin Monitor API",
-    version="0.1.0",
-    description="Read login events and security alerts from PostgreSQL.",
+    version="0.2.0",
+    description="Read login events, receive live updates, and host the local staff portal.",
+    lifespan=lifespan,
 )
+app.include_router(portal_router)
 
 
 class LoginEvent(BaseModel):
@@ -51,46 +67,24 @@ class SecurityAlert(BaseModel):
     updated_at: datetime
 
 
-def connect() -> psycopg.Connection:
-    """Open a connection using local environment settings; never log credentials."""
-    required = ("DB_NAME", "DB_USER", "DB_PASSWORD")
-    missing = [key for key in required if not os.getenv(key)]
-    if missing:
-        raise HTTPException(
-            status_code=503,
-            detail="Database configuration is incomplete; set DB_NAME, DB_USER, and DB_PASSWORD.",
-        )
-
-    try:
-        return psycopg.connect(
-            host=os.getenv("DB_HOST", "localhost"),
-            port=int(os.getenv("DB_PORT", "5432")),
-            dbname=os.environ["DB_NAME"],
-            user=os.environ["DB_USER"],
-            password=os.environ["DB_PASSWORD"],
-            connect_timeout=5,
-            row_factory=dict_row,
-        )
-    except (psycopg.Error, ValueError) as exc:
-        raise HTTPException(status_code=503, detail="Could not connect to PostgreSQL.") from exc
-
-
-def normalize_ip_rows(rows: list[dict]) -> list[dict]:
-    """Serialize PostgreSQL inet values as JSON-friendly address strings."""
-    for row in rows:
-        value = row.get("source_ip")
-        if isinstance(value, (IPv4Address, IPv6Address)):
-            row["source_ip"] = str(value)
-        elif value is not None:
-            row["source_ip"] = str(value).split("/")[0]
-    return rows
-
-
 @app.get("/health")
 def health() -> dict[str, str]:
     with connect() as conn:
         conn.execute("SELECT 1")
     return {"status": "ok", "database": "connected"}
+
+
+@app.get("/live")
+async def live_updates() -> StreamingResponse:
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.get("/login-events", response_model=list[LoginEvent])
@@ -106,6 +100,11 @@ def list_login_events(
 ) -> list[dict]:
     if start_time and end_time and end_time < start_time:
         raise HTTPException(status_code=422, detail="end_time must be after start_time.")
+    if source_ip is not None:
+        try:
+            ip_address(source_ip)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail="source_ip must be a valid IP address.") from exc
 
     clauses: list[str] = []
     params: list[object] = []
@@ -235,5 +234,5 @@ def dashboard_summary() -> dict:
     }
 
 
-DASHBOARD_DIR = Path(__file__).resolve().parent.parent / "dashboard"
-app.mount("/", StaticFiles(directory=DASHBOARD_DIR, html=True), name="dashboard")
+app.mount("/portal", StaticFiles(directory=ROOT / "portal", html=True), name="portal")
+app.mount("/", StaticFiles(directory=ROOT / "dashboard", html=True), name="dashboard")

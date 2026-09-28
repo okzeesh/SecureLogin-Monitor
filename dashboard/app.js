@@ -193,6 +193,24 @@ byId("alert-filters").addEventListener("submit", (event) => { event.preventDefau
 byId("clear-alert-filters").addEventListener("click", () => { byId("alert-filters").reset(); alertOffset = 0; loadAlertTable().catch(() => {}); });
 byId("previous-alert-page").addEventListener("click", () => { alertOffset = Math.max(0, alertOffset - PAGE_SIZE); loadAlertTable().catch(() => {}); });
 byId("next-alert-page").addEventListener("click", () => { alertOffset += PAGE_SIZE; loadAlertTable().catch(() => {}); });
+function setLiveState(connected, message) {
+  const pill = byId("live-pill");
+  pill.classList.toggle("is-live", connected);
+  pill.classList.toggle("is-offline", !connected);
+  pill.innerHTML = `<span class="range-dot"></span>${message}`;
+}
+
+function startLiveFeed() {
+  const source = new EventSource("/live");
+  source.addEventListener("ready", () => setLiveState(true, "Live from staff portal"));
+  source.onmessage = () => {
+    setLiveState(true, "Live · event received");
+    refreshDashboard();
+  };
+  source.onerror = () => setLiveState(false, "Live feed reconnecting");
+}
+
 byId("refresh-button").addEventListener("click", refreshDashboard);
 refreshDashboard();
-setInterval(refreshDashboard, 60000);
+startLiveFeed();
+setInterval(refreshDashboard, 8000);

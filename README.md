@@ -109,7 +109,13 @@ For an existing database, apply the small additive migration once before running
 & 'D:\postgresql\bin\psql.exe' -h localhost -U postgres -W -d securelogin_db -v ON_ERROR_STOP=1 -f 'sql\upgrade_detection.sql'
 ```
 
-The dashboard is served by FastAPI at `/`. It includes 24-hour KPIs, hourly activity, open alerts, top failed source IPs, country counts, and a filterable/paginated login table.
+The dashboard is served by FastAPI at `/`. It includes 24-hour KPIs, hourly activity, open alerts, top failed source IPs, country counts, and a filterable/paginated login table. It stays current over `/live` (server-sent events) and a short refresh interval.
+
+## Live local website
+
+`http://127.0.0.1:8000/portal/` is a real staff intranet hosted on this machine. Each sign-in attempt is inserted into `login_events`, detection runs immediately, and the dashboard updates without a manual reload.
+
+Lab accounts are shown on the portal page. Use a wrong password several times, sign in with MFA, or change the reported location to generate live alerts.
 
 ### Local setup and run
 
@@ -119,6 +125,6 @@ The dashboard is served by FastAPI at `/`. It includes 24-hour KPIs, hourly acti
 4. Load 5,000 events: `.\.venv\Scripts\python.exe scripts\generate_sample_events.py`.
 5. Apply the detection migration with `.\.venv\Scripts\python.exe -m scripts.apply_detection_migration`, then run `.\.venv\Scripts\python.exe -m scripts.run_detection`.
 6. Start the API and dashboard: `.\.venv\Scripts\python.exe -m uvicorn api.main:app --reload`.
-7. Open `http://127.0.0.1:8000/`; API documentation is at `http://127.0.0.1:8000/docs`.
+7. Open the dashboard at `http://127.0.0.1:8000/` and the staff website at `http://127.0.0.1:8000/portal/`. API documentation is at `http://127.0.0.1:8000/docs`.
 
 Step 7 verified: `/health` reports a database connection; the events endpoint returned 25 rows with 5,025 total; all five alert types appeared in the dashboard/API; the dashboard returned HTTP 200; and a second detection run created zero duplicate alerts. The current database contains the original 25 hand-authored examples, 5,000 generated events, and 15 open alerts (2 brute-force, 1 suspicious IP, 9 new-device, 2 impossible-travel, 1 abnormal-frequency).
