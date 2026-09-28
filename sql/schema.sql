@@ -65,6 +65,7 @@ CREATE TABLE security_alerts (
     source_ip           INET,
     username            VARCHAR(100),
     description         TEXT NOT NULL,
+    dedupe_key          VARCHAR(64) UNIQUE,
     status              VARCHAR(20) NOT NULL DEFAULT 'OPEN',
     failed_attempt_count INTEGER,
     window_start        TIMESTAMPTZ,

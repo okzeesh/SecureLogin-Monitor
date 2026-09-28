@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a1119">
+  <title>SecureLogin Monitor</title>
+  <link rel="stylesheet" href="/styles.css?v=2">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="SecureLogin Monitor home">
+        <span class="brand-mark">S</span>
+        <span>SecureLogin<span class="brand-muted">Monitor</span></span>
+      </a>
+      <div class="side-label">MONITORING</div>
+      <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span>Overview</a>
+      <a class="nav-link" href="#events"><span class="nav-icon">↳</span>Login events</a>
+      <a class="nav-link" href="#alerts"><span class="nav-icon">◈</span>Security alerts</a>
+      <div class="sidebar-bottom">
+        <span class="live-dot"></span>
+        <span id="connection-label">Connecting to database</span>
+      </div>
+    </aside>
+
+    <main class="main-content" id="overview">
+      <header class="topbar">
+        <div class="breadcrumb">Security <span>/</span> Overview</div>
+        <div class="topbar-right">
+          <span class="updated-label" id="last-updated">Waiting for data</span>
+          <button class="icon-button" id="refresh-button" title="Refresh dashboard" aria-label="Refresh dashboard">↻</button>
+          <div class="avatar" title="Local workspace">SL</div>
+        </div>
+      </header>
+
+      <section class="page-heading">
+        <div>
+          <div class="eyebrow">AUTHENTICATION SECURITY</div>
+          <h1>Security overview</h1>
+          <p>Login activity and detected threats across your environment.</p>
+        </div>
+        <div class="range-pill"><span class="range-dot"></span>Last 24 hours</div>
+      </section>
+
+      <section class="kpi-grid" aria-label="Key metrics">
+        <article class="kpi-card"><div class="kpi-top"><span>Login events</span><span class="kpi-icon blue">↳</span></div><div class="kpi-value" id="kpi-events">—</div><div class="kpi-foot">In the last 24 hours</div></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Failed logins</span><span class="kpi-icon red">!</span></div><div class="kpi-value" id="kpi-failures">—</div><div class="kpi-foot"><span class="status-dot red-dot"></span>Requires monitoring</div></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Open alerts</span><span class="kpi-icon amber">◈</span></div><div class="kpi-value" id="kpi-alerts">—</div><div class="kpi-foot" id="kpi-severity">Across all severities</div></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Active accounts</span><span class="kpi-icon green">◎</span></div><div class="kpi-value" id="kpi-users">—</div><div class="kpi-foot">Seen in the last 24 hours</div></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel activity-panel">
+          <div class="panel-heading"><div><h2>Login activity</h2><p>Events per hour · last 24 hours</p></div><div class="legend"><span><i class="legend-success"></i>All events</span><span><i class="legend-failed"></i>Failures</span></div></div>
+          <div class="chart-wrap"><svg id="activity-chart" viewBox="0 0 720 230" role="img" aria-label="Login events by hour"></svg></div>
+        </article>
+        <article class="panel alerts-panel" id="alerts">
+          <div class="panel-heading"><div><h2>Open alerts</h2><p>Latest detected security activity</p></div><a class="text-link" href="#all-alerts">View all</a></div>
+          <div id="alerts-list" class="alert-list"><div class="empty-state">Loading alerts…</div></div>
+        </article>
+        <article class="panel ips-panel">
+          <div class="panel-heading"><div><h2>Top failed source IPs</h2><p>Failed attempts · last 24 hours</p></div></div>
+          <div id="ip-bars" class="bar-list"><div class="empty-state">Loading activity…</div></div>
+        </article>
+        <article class="panel countries-panel">
+          <div class="panel-heading"><div><h2>Login locations</h2><p>Events by reported country</p></div></div>
+          <div id="country-bars" class="bar-list"><div class="empty-state">Loading locations…</div></div>
+        </article>
+      </section>
+
+      <section class="panel events-panel" id="events">
+        <div class="panel-heading events-heading"><div><h2>Recent login events</h2><p>Search and filter authentication attempts</p></div><span class="result-count" id="event-count">—</span></div>
+        <form id="filters" class="filter-row">
+          <label class="search-field"><span>⌕</span><input id="filter-username" type="search" placeholder="Filter by username" maxlength="100"></label>
+          <select id="filter-status" aria-label="Filter by status"><option value="">All results</option><option value="SUCCESS">Successful</option><option value="FAILED">Failed</option></select>
+          <input id="filter-ip" type="text" placeholder="Source IP" aria-label="Filter by source IP">
+          <button class="filter-button" type="submit">Apply filters</button>
+          <button class="clear-button" id="clear-filters" type="button">Clear</button>
+        </form>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>TIME</th><th>USER</th><th>SOURCE IP</th><th>LOCATION</th><th>DEVICE</th><th>METHOD</th><th>RESULT</th></tr></thead>
+            <tbody id="events-table"><tr><td colspan="7" class="empty-state">Loading events…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="table-footer"><span id="pagination-label">—</span><div><button class="page-button" id="previous-page" disabled>Previous</button><button class="page-button" id="next-page" disabled>Next</button></div></div>
+      </section>
+      <section class="panel events-panel all-alerts-panel" id="all-alerts">
+        <div class="panel-heading events-heading"><div><h2>Security alerts</h2><p>Detected activity with severity and workflow status</p></div><span class="result-count" id="alert-count">—</span></div>
+        <form id="alert-filters" class="filter-row">
+          <select id="alert-status-filter" aria-label="Filter alerts by status"><option value="">All statuses</option><option value="OPEN">Open</option><option value="ACKNOWLEDGED">Acknowledged</option><option value="RESOLVED">Resolved</option><option value="FALSE_POSITIVE">False positive</option></select>
+          <select id="alert-severity-filter" aria-label="Filter alerts by severity"><option value="">All severities</option><option value="CRITICAL">Critical</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option><option value="LOW">Low</option></select>
+          <button class="filter-button" type="submit">Apply filters</button><button class="clear-button" id="clear-alert-filters" type="button">Clear</button>
+        </form>
+        <div class="table-scroll"><table><thead><tr><th>CREATED</th><th>TYPE</th><th>SEVERITY</th><th>USER</th><th>SOURCE IP</th><th>STATUS</th><th>DESCRIPTION</th></tr></thead><tbody id="alerts-table"><tr><td colspan="7" class="empty-state">Loading alerts…</td></tr></tbody></table></div>
+        <div class="table-footer"><span id="alert-pagination-label">—</span><div><button class="page-button" id="previous-alert-page" disabled>Previous</button><button class="page-button" id="next-alert-page" disabled>Next</button></div></div>
+      </section>
+      <footer>SecureLogin Monitor <span>·</span> Synthetic and authentication telemetry</footer>
+    </main>
+  </div>
+  <script src="/app.js?v=2" defer></script>
+</body>
+</html>
